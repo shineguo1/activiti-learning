@@ -1,5 +1,6 @@
 package gxj.study;
 
+import gxj.study.activiti.SpringbootActivitiApplication;
 import gxj.study.activiti.config.SecurityUtil;
 import org.activiti.api.process.runtime.ProcessRuntime;
 import org.activiti.api.runtime.shared.query.Page;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = SpringbootActivitiApplication.class)
 //@EnableAspectJAutoProxy(proxyTargetClass = false)
 public class BaseTest {
 

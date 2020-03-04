@@ -27,6 +27,8 @@ public class ActivitiTest extends BaseTest {
     //流程定义信息 查看
     @Test
     public void testDefinition(){
+        //模拟登录用户，spring-security认证
+        securityUtil.logInAs("bob");
         //分页查询流程信息
         //注意：流程部署工作在activiti7与springboot整合后，会自动部署 resource/processes/*.bpmn
         Page processDefinitionPage = processRuntime.processDefinitions(Pageable.of(0,10));

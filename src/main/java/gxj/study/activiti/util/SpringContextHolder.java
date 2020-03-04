@@ -1,4 +1,4 @@
-package gxj.study.util;
+package gxj.study.activiti.util;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
