@@ -11,7 +11,10 @@ import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.repository.DeploymentQuery;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,13 +23,14 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author xinjie_guo
  * @version 1.0.0 createTime:  2020/3/4 10:15
  * @description
  */
-public class ActivitiTest extends BaseTest {
+public class Activiti7Test extends BaseTest {
 
     @Autowired
     private ProcessRuntime processRuntime;//实现流程定义相关操作
@@ -37,9 +41,9 @@ public class ActivitiTest extends BaseTest {
     @Autowired
     private SecurityUtil securityUtil; //Security相关工具类
 
-    @Autowired
-    private ProcessEngine processEngine;
-
+    /**
+     * activiti7 接口
+     */
     //流程定义信息 查看
     //注意：processRuntime.processDefinitions接口会自动部署符合 resource/processes/*.bpmn 路径条件的所有bpmn文件
     @Test
@@ -60,21 +64,9 @@ public class ActivitiTest extends BaseTest {
         }
     }
 
-    @Test
-    public void test_deploy_a_process(){
-
-        //读取字符串作为一个输入流
-        InputStream bpmn = new ByteArrayInputStream(BpmnMockData.getBpmn01().getBytes());
-
-
-        Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
-                .createDeployment()//创建部署对象
-                .addInputStream("InputStream01.bpmn",bpmn)
-//                .addInputStream("helloworld.png", pngfileInputStream)
-                .deploy();//完成部署
-        System.out.println("部署ID："+deployment.getId());//1
-        System.out.println("部署时间："+deployment.getDeploymentTime());
-    }
+    /**
+     * activiti7 接口
+     */
     //启动流程
     @Test
     public void test_create_process_instance() {
@@ -82,7 +74,7 @@ public class ActivitiTest extends BaseTest {
 
         ProcessInstance processInstance = processRuntime.start(ProcessPayloadBuilder
                 .start()
-                .withProcessDefinitionKey("myProcess_2")
+                .withProcessDefinitionKey("myProcess_inputStream_01")
 //                .withName("Processing Content: " + content)
 //                .withVariable("content", content)
                 .build());
@@ -90,6 +82,9 @@ public class ActivitiTest extends BaseTest {
 
     }
 
+    /**
+     * activiti7 接口
+     */
     // 查询任务 & 完成任务
     @Test
     public void test_query_and_complete_tasks() {
@@ -110,6 +105,9 @@ public class ActivitiTest extends BaseTest {
         queryTasks();
     }
 
+    /**
+     * activiti7 接口
+     */
     private Page<Task> queryTasks(){
         //分页查询任务 : taskRuntime.tasks()
         Page<Task> taskPage = taskRuntime.tasks(Pageable.of(0, 10));
@@ -124,6 +122,9 @@ public class ActivitiTest extends BaseTest {
         return taskPage;
     }
 
+    /**
+     * activiti7 接口
+     */
     private Page<Task> doTasks(Page<Task> taskPage){
         if (taskPage.getTotalItems() > 0) {
             //查询到有任务
@@ -141,6 +142,5 @@ public class ActivitiTest extends BaseTest {
         }
         return taskPage;
     }
-
-
+    
 }
