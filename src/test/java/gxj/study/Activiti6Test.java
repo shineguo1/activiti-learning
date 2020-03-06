@@ -7,14 +7,15 @@ import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
 import org.activiti.api.process.runtime.ProcessRuntime;
 import org.activiti.api.runtime.shared.query.Page;
 import org.activiti.api.runtime.shared.query.Pageable;
-import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.task.Task;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +43,7 @@ public class Activiti6Test extends BaseTest {
     public void test_deploy_a_process(){
 
         //读取字符串作为一个输入流
-        InputStream bpmn = new ByteArrayInputStream(BpmnMockData.getBpmn01().getBytes());
+        InputStream bpmn = new ByteArrayInputStream(BpmnMockData.getBpmnCondition01().getBytes());
 
 
         Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
@@ -96,6 +97,32 @@ public class Activiti6Test extends BaseTest {
         }
     }
 
+    @Autowired
+    TaskService taskService;
+    /**
+     * 查询任务
+     */
+    @Test
+    public void test_query_task(){
+        String candidateUser = "other";
+        String processDefinitionKey = "myProcess_inputStream_01";
+// 创建TaskService
+        TaskService taskService = processEngine.getTaskService();
+//查询组任务
+        List<Task> list = taskService.createTaskQuery()//
+//                .processDefinitionKey(processDefinitionKey)//
+                .taskCandidateUser(candidateUser)//根据候选人查询
+                .list();
+        System.out.println(">>> other任务：" + list);
+
+        candidateUser = "john";
+        list = taskService.createTaskQuery()//
+//                .processDefinitionKey(processDefinitionKey)//
+                .taskCandidateUser(candidateUser)//根据候选人查询
+                .list();
+        System.out.println(">>> john任务：" + list);
+
+    }
 
 
 
