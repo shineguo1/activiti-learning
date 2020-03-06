@@ -30,7 +30,7 @@ public class BpmnMockData {
                 "    <userTask activiti:candidateGroups=\"activitiTeam\" activiti:exclusive=\"true\" id=\"_4\" name=\"task2\"/>\n" +
                 "    <endEvent id=\"_5\" name=\"EndEvent\"/>\n" +
                 "    <sequenceFlow id=\"_6\" sourceRef=\"_2\" targetRef=\"_3\"/>\n" +
-                "    <userTask activiti:exclusive=\"true\" id=\"_9\" name=\"task3\"/>\n" +
+                "    <userTask activiti:candidateGroups=\"otherTeam\" activiti:exclusive=\"true\" id=\"_9\" name=\"task3\"/>\n" +
                 "    <exclusiveGateway gatewayDirection=\"Unspecified\" id=\"_10\" name=\"ExclusiveGateway\"/>\n" +
                 "    <sequenceFlow id=\"_11\" sourceRef=\"_3\" targetRef=\"_10\"/>\n" +
                 "    <sequenceFlow id=\"_12\" sourceRef=\"_10\" targetRef=\"_4\">\n" +

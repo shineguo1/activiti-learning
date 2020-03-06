@@ -1,7 +1,6 @@
 package gxj.study;
 
 import gxj.study.activiti.config.SecurityUtil;
-import gxj.study.util.BpmnMockData;
 import org.activiti.api.process.model.ProcessInstance;
 import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
 import org.activiti.api.process.runtime.ProcessRuntime;
@@ -11,21 +10,11 @@ import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.SetTaskVariablesPayloadBuilder;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentQuery;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +56,8 @@ public class Activiti7Test extends BaseTest {
         }
     }
 
+//    private
+
     /**
      * activiti7 接口
      * 启动流程
@@ -74,8 +65,8 @@ public class Activiti7Test extends BaseTest {
     @Test
     public void test_create_process_instance() {
         securityUtil.logInAs("bob");
-        HashMap<String,Object> vars = new HashMap<>();
-//        vars.put("amount",5);
+        HashMap<String, Object> vars = new HashMap<>();
+        vars.put("amount", 2);
         ProcessInstance processInstance = processRuntime.start(ProcessPayloadBuilder
                 .start()
                 .withProcessDefinitionKey("myProcess_condition_01")
@@ -87,29 +78,33 @@ public class Activiti7Test extends BaseTest {
     }
 
     /**
-     * activiti7 接口
+     * 遍历两个用户组，查询并完成所有任务
      */
-    // 查询任务 & 完成任务
     @Test
     public void test_query_and_complete_tasks() {
-        //模拟用户认证信息：orther组登录，查询任务
-        securityUtil.logInAs("other");
-        System.out.println(">>> otherTeam组中用户登录");
-        Page<Task> tasks = queryTasks();
+        test_login_and_query_and_complete_users_tasks("other");
+        test_login_and_query_and_complete_users_tasks("john");
+    }
 
+    /**
+     * 查询并完成用户所在用户组的任务
+     *
+     * @param username 用户
+     */
+    private void test_login_and_query_and_complete_users_tasks(String username) {
         //模拟用户认证信息
-        securityUtil.logInAs("john");
-        //参数
-        Map<String,Object> vars = new HashMap<>();
+        securityUtil.logInAs(username);
+        Map<String, Object> vars = new HashMap<>();
 //        vars.put("amount",5);
-        System.out.println(">>> activitiTeam组中用户登录");
         //查询当前任务
-        tasks = queryTasks();
-        //执行当前任务
-        doTasks(tasks,vars,false);
-        //再查询一次任务
-        System.out.println(">>> 二次查询任务");
-        queryTasks();
+        Page<Task> tasks = queryTasks();
+        if (tasks.getTotalItems() > 0) {
+            //执行当前任务
+            doTasks(tasks, vars, false);
+            //再查询一次任务
+            System.out.println(">>> 二次查询任务");
+            queryTasks();
+        }
     }
 
     /**
@@ -185,30 +180,40 @@ public class Activiti7Test extends BaseTest {
      * 删除流程实例
      */
     @Test
-    public void test_delete_processInstance(){
+    public void test_delete_processInstance() {
         securityUtil.logInAs("john");
-        queryTasks();
+        queryProcessInstances();
         String processInstanceId = "bc4caa02-5f4e-11ea-afbe-00ff3d734641";
         String reason = "Unknown property used in expression: ${amout > 3}";
         processRuntime.delete(ProcessPayloadBuilder.delete().withProcessInstanceId(processInstanceId).withReason(reason).build());
-        System.out.println(">>> 删除流程实例："+processInstanceId);
-        queryTasks();
+        System.out.println(">>> 删除流程实例：" + processInstanceId);
+        queryProcessInstances();
     }
 
     /**
      * 中止所有流程实例（清空）
      */
     @Test
-    public void test_clear_all(){
-        securityUtil.logInAs("john");
-        Page<Task> taskPage = queryTasks();
-        taskPage.getContent().forEach(task->{
+    public void test_clear_all() {
+        securityUtil.logInAs("other");
+        Page<ProcessInstance> processInstancePage = queryProcessInstances();
+        processInstancePage.getContent().forEach(pi -> {
             String reason = "something";
-            processRuntime.delete(ProcessPayloadBuilder.delete().withProcessInstanceId(task.getProcessInstanceId()).withReason(reason).build());
-            System.out.println(">>> 删除流程实例："+task.getProcessInstanceId());
+            processRuntime.delete(ProcessPayloadBuilder.delete().withProcessInstanceId(pi.getId()).withReason(reason).build());
+            System.out.println(">>> 删除流程实例：" + pi.getId());
 
         });
-        queryTasks();
+        queryProcessInstances();
 
+    }
+
+    private Page<ProcessInstance> queryProcessInstances() {
+        Page<ProcessInstance> processInstancePage = processRuntime.processInstances(Pageable.of(0, 10));
+        if (processInstancePage.getTotalItems() > 0) {
+            processInstancePage.getContent().forEach(pi -> System.out.println(">>> 流程实例：" + pi));
+        } else {
+            System.out.println(">>> 查无流程实例");
+        }
+        return processInstancePage;
     }
 }
