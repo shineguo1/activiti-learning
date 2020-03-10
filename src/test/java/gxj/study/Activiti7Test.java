@@ -1,6 +1,7 @@
 package gxj.study;
 
 import gxj.study.activiti.config.SecurityUtil;
+import gxj.study.activiti.service.FormService;
 import org.activiti.api.process.model.ProcessInstance;
 import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
 import org.activiti.api.process.runtime.ProcessRuntime;
@@ -10,11 +11,14 @@ import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.SetTaskVariablesPayloadBuilder;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.RepositoryService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +37,8 @@ public class Activiti7Test extends BaseTest {
     @Autowired
     private SecurityUtil securityUtil; //Security相关工具类
 
+    @Autowired
+    private FormService formService;
     /**
      * activiti7 接口
      * 流程定义信息 查看
@@ -56,7 +62,8 @@ public class Activiti7Test extends BaseTest {
         }
     }
 
-//    private
+    @Autowired
+    private RepositoryService repositoryService;
 
     /**
      * activiti7 接口
@@ -66,14 +73,37 @@ public class Activiti7Test extends BaseTest {
     public void test_create_process_instance() {
         securityUtil.logInAs("bob");
         HashMap<String, Object> vars = new HashMap<>();
-        vars.put("amount", 2);
+        vars.put("amount", 5);
         ProcessInstance processInstance = processRuntime.start(ProcessPayloadBuilder
                 .start()
-                .withProcessDefinitionKey("myProcess_condition_01")
+                .withProcessDefinitionKey("myProcess_withForm_01")
 //                .withName("Processing Content: " + content)
                 .withVariables(vars)
                 .build());
         System.out.println(">>> 创建流程实例: " + processInstance);
+
+    }
+
+    /**
+     * activiti7 接口
+     * 启动流程 - 表单
+     */
+    @Test
+    public void test_create_process_instance_withForm() {
+        securityUtil.logInAs("bob");
+        HashMap<String, Object> vars = new HashMap<>();
+        vars.put("amount", 5);
+        ProcessInstance processInstance = processRuntime.start(ProcessPayloadBuilder
+                .start()
+                .withProcessDefinitionKey("myProcess_withForm_01")
+//                .withName("Processing Content: " + content)
+                .withVariables(vars)
+                .build());
+        System.out.println(">>> 创建流程实例: " + processInstance);
+        String processDefinitionId = processInstance.getProcessDefinitionId();
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+        List<String> startEventFormTypes = bpmnModel.getStartEventFormTypes();
+        System.out.println(">>> 流程表单详情: " + startEventFormTypes);
 
     }
 
@@ -102,8 +132,8 @@ public class Activiti7Test extends BaseTest {
             //执行当前任务
             doTasks(tasks, vars, false);
             //再查询一次任务
-            System.out.println(">>> 二次查询任务");
-            queryTasks();
+//            System.out.println(">>> 二次查询任务");
+//            queryTasks();
         }
     }
 

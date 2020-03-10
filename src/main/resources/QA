@@ -1,0 +1,16 @@
+1. 初始化的25张表及默认数据 - 完成 path: .../桌面/log/dbTable.sql
+2. bpmn是否可以只写流程节点，不写图节点。 - 可以
+3. 如何使用字节流部署流程
+   //1) 读取字符串作为一个输入流
+ InputStream bpmn = new ByteArrayInputStream(BpmnMockData.getBpmn01().getBytes());
+ Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
+                .createDeployment()//创建部署对象
+                .addInputStream("InputStream01.bpmn",bpmn)
+                .deploy();//完成部署
+    //2) 使用BpmnModel对象，即用.addBpmnModel代替.addInputStream
+4. 完成某个任务时提交的数据，是否可以成为下个条件分支的判断依据？即完成某个任务时，是否可以传参数？
+5. activiti7 与 spring-security强耦合，是否需要使用activiti6的接口？即解决用户、用户组、权限问题。
+    1）activiti7能用identityService管理用户吗？ - activiti7 删除了用户表和identityService表
+
+6. 理清processDefinition，processInstance和task的关系。
+ - bpmn部署后成为proccessDefiniton（记入db）；用户每发起一次流程定义后产生一个processInstance；流程实例的每个节点都是一个task。
