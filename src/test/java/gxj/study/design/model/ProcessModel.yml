@@ -1,0 +1,36 @@
+ProcessDef:
+  id* : 'e.g. myProcess_01'
+  name: 'e.g. VPN申请'
+  # 用户任务
+  userTasks[]:
+    - id*: 'e.g. _1'
+      name : 'e.g. 技术保障部审批'
+      candidateUsers[]: '数组或uel表达式 e.g. [{xiaoming},{xiaohong}] or ${usernames}'
+      candidateGroups[]: '数组或uel表达式 e.g. [{devGroup},{testGroup}] or ${userGroups}'
+      exclusive: "true" # hard code activiti默认值。同一个流程实例下的任务会串行执行，即类似单线程，同时只能执行一个任务，即使是并行网关下互不干扰的任务。
+      priority: # [0,100] 的整数
+      dueDate: java.util.Date
+    - ...
+    # 条件网关 - 即控制模块
+    gateways[]:
+     - id* : 'e.g. _2'
+#       name :
+       type* : # 枚举 parallel，exclusive，inclusive
+     - ...
+     # 连线 - 即任务流
+     sequenceFlows[]:
+     - id* :  'e.g. _3'
+       sourceRef* : 'e.g. _1'
+       targetRef* : 'e.g. _2'
+       conditionExpression : 'uel表达式 e.g. ${amount>3}'
+
+ProcessDefnitionBriefInfo:
+  id:
+  name:
+  createAt:
+  createBy:
+  updateAt:
+  updateBy:
+
+
+

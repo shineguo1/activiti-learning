@@ -1,0 +1,32 @@
+FormTemplate:
+  id : '数据库主键 - 唯一标识'
+  processDefId: 'e.g. myProcess_01'
+  name: 'e.g. 充值表单'
+#  formTempNo : 'e.g. myForm_01' 取决于前端是否需要对表单标识一个Code'
+  modules[]:
+    - formFields[]:
+      - key* : 'e.g. city'
+        type* : 'e.g. String'
+        moduleType: 'e.g. 财务 or 商户'
+      - ...
+      moduleNo:
+      moduleName:
+      displayFlag:
+    - ...
+
+FormInstance:
+   id : # 表单实例id
+   name: 'e.g. 充值表单'
+   formTempNo :
+
+   modules[]: 'e.g. 财务 or 商户'
+    - formFileds[]:
+      - key* : 'e.g. city'
+        type* : 'e.g. String'
+        intValue:
+        stringValue: 'e.g. 上海'
+        decimalValue:
+        dateValue:
+    - moduleNo:
+    - moduleName:
+#    - displayFlag:
