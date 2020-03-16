@@ -1,6 +1,7 @@
 package gxj.study;
 
-import gxj.study.util.BpmnMockData;
+import gxj.study.activiti.util.BpmnMockData;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
@@ -53,17 +54,28 @@ public class Activiti6Test extends BaseTest {
 //        System.out.println("部署时间："+deployment.getDeploymentTime());
     }
 
+    @Test
+    public void test_deploy_a_process_by_bpmnModel() {
+
+        BpmnModel bpmnModel = BpmnMockData.getBpmnCondition02Model();
+        Deployment deployment = processEngine.getRepositoryService()//获取流程定义和部署对象相关的Service
+                .createDeployment()//创建部署对象
+                .addBpmnModel("bpmnModel01.bpmn", bpmnModel)
+                .deploy();//完成部署
+        System.out.println("部署详情：" + deployment);//1
+    }
+
     /**
      * activiti6 接口
      */
     @Test
     public void test_query_process_by_repositoryService() {
-        String deploymentId = "280e4400-5e8b-11ea-9ed9-00ff3d734641";
+//        String deploymentId = "280e4400-5e8b-11ea-9ed9-00ff3d734641";
         // 使用repositoryService查询单个部署对象
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-        Deployment deployment1 = deploymentQuery.deploymentId(deploymentId).singleResult();
-        System.out.println("查询单个部署对象：");
-        System.out.println("部署对象：" + deployment1);
+//        Deployment deployment1 = deploymentQuery.deploymentId(deploymentId).singleResult();
+//        System.out.println("查询单个部署对象：");
+//        System.out.println("部署对象：" + deployment1);
 
 // 使用repositoryService查询多个部署对象
         List<Deployment> deploymentList = deploymentQuery
@@ -75,19 +87,21 @@ public class Activiti6Test extends BaseTest {
             System.out.println("部署对象：" + deploy);
         }
 
-// 使用repositoryService查询单个流程定义
-        ProcessDefinition processDefPinition = repositoryService
-                .createProcessDefinitionQuery()
-                .deploymentId(deploymentId)
-                .singleResult();
-        System.out.println("查询单个流程定义：");
-        System.out.println("流程定义：" + processDefPinition);
+//// 使用repositoryService查询单个流程定义
+//        ProcessDefinition processDefPinition = repositoryService
+//                .createProcessDefinitionQuery()
+//                .deploymentId(deploymentId)
+//                .singleResult();
+//        System.out.println("查询单个流程定义：");
+//        System.out.println("流程定义：" + processDefPinition);
 
 
 // 使用repositoryService查询多个流程定义
         List<ProcessDefinition> processDefinitionList = repositoryService
                 .createProcessDefinitionQuery()
-                .deploymentId(deploymentId)
+                .processDefinitionCategoryLike("")
+                .processDefinitionName("definitionname")
+//                .deploymentId(deploymentId)
                 .listPage(0, 100);
         System.out.println("查询多个流程定义：");
         for (ProcessDefinition pd : processDefinitionList) {
@@ -120,7 +134,6 @@ public class Activiti6Test extends BaseTest {
                 .taskCandidateUser(candidateUser)//根据候选人查询
                 .list();
         System.out.println(">>> john任务：" + list);
-
     }
 
 
@@ -135,12 +148,13 @@ public class Activiti6Test extends BaseTest {
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
         List<HistoricProcessInstance> list = historicProcessInstanceQuery
                 .involvedUser("bob")
-                .processDefinitionKey("myProcess_withForm_01")
+//                .processDefinitionKey("myProcess_BpmnModel_01")
+                .processInstanceBusinessKey("someBusiness")
                 .list();
         System.out.println(">>>历史记录："+list.size()+"条");
         list.forEach(hisProcess -> {
             System.out.println(">>>历史记录：" + hisProcess);
-            String superProcessInstanceId = hisProcess.getSuperProcessInstanceId();
+            String superProcessInstanceId = hisProcess.getSuperProcessInstanceId();//是null，没做到过滤
             HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
             List<HistoricTaskInstance> tasks = historicTaskInstanceQuery
                     .processInstanceId(superProcessInstanceId)
