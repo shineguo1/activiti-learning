@@ -26,8 +26,8 @@
   T_PROCESS_FORM_TEMPLATE_FIELD:
     id : '主键'
     formTempModuleId: '模块id'
-    entityKey : '表字段 key值' name
-    entityName: '表字段 中文名称' xingming
+    entityKey : '表字段 key值'
+    entityName: '表字段 中文名称'
     valueType: '表字段 值类型'
     deleteFlag: '0:否; 1:是'
     createdBy:
@@ -35,12 +35,10 @@
     updatedBy:
     updatedAt:
 
-  unique key: "('formCode','entityCode')"
-
 T_PROCESS_FORM_INSTANCE:
   id : '主键'
   processInstanceId:
-  formTempNo : '表类型'
+  formTempId : '表类型'
   moduleNo:
   moduleName:
   entityKey : '表字段 key值'
@@ -49,6 +47,11 @@ T_PROCESS_FORM_INSTANCE:
   stringValue: '字段值 e.g. 上海'
   decimalValue: '字段值'
   dateValue: '字段值'
+  createdBy:
+  createdAt:
+  updatedBy:
+  updatedAt:
+
 
 
 # instance是历史信息，template会变，不做关联

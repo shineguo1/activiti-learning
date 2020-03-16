@@ -1,0 +1,59 @@
+ProcessDef:
+  id:
+  name:
+  key:
+  category:
+  usable:
+  prioriy:
+
+
+flowNode:
+  id:
+  nodeKey:
+  processKey:
+  nodeName:
+  conditionExpression:
+  candidateUsers:
+  candidateGroups:
+  valueType:
+  description:
+  valueRule:
+  approveRule: '自动/人工'
+  parrallelFlag: '是否会签'
+
+
+
+  Map<priority,flowNode[]> tasks:
+    1. add startNode
+    2. find tasks wherer priority = 1
+       add tasks and lines
+    3. find tasks wherer priority = 2
+       add tasks and lines
+       ....
+    n. add endNode
+       add line (lastNode to end)
+       if lastNode is 排他网关
+         line.addCondition(条件表达式-通过)
+
+    add tasks and lines(tasks, lastNode, lastTasksNodes):
+      if tasks > 1 //会签
+         add 并行网关
+         if(lastNode is 排他网关)
+            add line (lastNode to 网关, condition = 条件表达式-通过)
+         else
+            and line (lastNode to 网关)
+         add tasks //priority = n
+         add lines (网关 to tasks)
+         add 并行网关2
+           // 会签无回退
+      if nodes = 1 //非会签
+         add task //priority = n
+         if(lastNode is 排他网关)
+            add line (lastNode to task, condition = 条件表达式-通过)
+         else
+            and line (lastNode to task)
+         add 排他网关
+         add line(网关 to 1,condition = 条件表达式-回退)
+
+
+

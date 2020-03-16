@@ -1,0 +1,103 @@
+  //第一步：前置工作 - 设置模板
+  //1.1 创建动态表单模板
+  var formTemp = formService.createFormTemplate(new FormTempDefinition());
+
+  //1.2 创建流程模板  - deploy包含创建和更新的概念
+  var formTemp = processService.deployProcessTemplate(new FormTempDefinition());
+
+  //第二步：管理员/系统/某人 发起了一个流程
+  mainProcessService.start(mainProcessId) // 能查到 processDefKey,formTempId
+  //2.1 创建流程实例，绑定表单
+  var processInstance = processService.createProcessInstance(... )
+              //传入processDefKey，formTempId, businessKey(业务流程名)，业务员，直属上级，系统任务回调类
+  //2.2 创建表单实例
+      - 即把这一时刻的表单模板信息拷贝到formInstance表中，表单字段的值是空的，用户填表单时更新对应字段的值。
+      - 表单实例表相当于是一张历史记录表，记录的是流程创建时表单模板的瞬间格式，和后续用户填的字段值；表单模板后续变化不会影响之前创建的表单实例。
+  formService.createFormInstance(formTempId，processInstanceId);
+
+  //第三步：业务员填写表单
+  //3.1 查询表单实例
+  var form = formService.queryFormInstance(processId);
+  return to front
+
+  //3.2 记录表单填写的内容
+  get json from front
+  var formInstance = convertToObject(json);
+
+  formService.saveFormInstance(formInstance)  //只允许更新(原更新人是空 || 原更新人=新更新人)的字段，不允许更新其他人的字段
+  processService.complete(taskId，comment)
+
+  第四步：流转到下个人
+  //3.1 查询表单给前端
+  var form = formService.queryFormInstance(processId);
+  return to front
+
+  //3.2 填写表单和审批意见，传给后端
+  var formInstance = convertToObject(json);
+  formService.saveFormInstance(formInstance)
+  processService.complete(taskId，comment)
+
+  第五步...
+
+
+
+在这个流程中formService涉及的职责：
+formService.createFormInstance(formTempId，processInstanceId);做的事：
+  根据formTempId查询模板，在表单实例表中插入记录，有值的字段包括：
+    id : '主键 - 自增'
+    processInstanceId: '流程实例id - 方法参数传入'
+    formTempId : '表类型 - 方法参数传入'
+    moduleNo: '查模板表'
+    moduleName: '查模板表'
+    entityKey : '查模板表'
+    valueType: '查模板表 字段业务类型 e.g. 文件，图片，视频，文字，金额'
+    intValue: '空'
+    stringValue: '空'
+    decimalValue: '空'
+    dateValue: '空'
+    createdBy: '当前用户 - 其实这字段没用'
+    createdAt: '当前时间'
+    updatedBy: '空 - 很关键，这是后续业务逻辑的判断条件'
+    updatedAt: '空'
+
+formService.queryFormInstance(processInstaceId) 做的事：
+  1. 从表单实例表中查所有processInstanceId的记录，这些记录会被全部提交给前端，但需要经过如下处理。
+  2. 在java里处理：分模块组织数据结构。给模块配置2个属性：可读标识和可写标识
+    2.1 可读标识：只要模块中存在一条记录有值，该模块可读标识为true。（通过更新人判断)
+    2.2 可写标识：当该模块不存在任何一条记录有值，即该模块所有记录更新人都为空，该模块可写标识为true。
+                  当该模块存在记录有值，且该模块存在记录的更新人是当前用户，该模块可写标识为true。（同一模块更新人只能是同一人）
+                  当该模块存在记录有值，且该模块存在记录的更新人不是当前用户，该模块可写标识为false。（同一模块更新人只能是同一人）
+        模块可读：前端会在表单中展示该模板，否则隐藏该模块。
+        模块不可读：前端会有一个不可见模块集合，允许用户添加模块，添加之后才可见。
+        模块可写：展示在网页上的模块，可写才允许编辑，不可写不允许编辑（实现需求：如果这个模块是别人写的，我无法编辑其中的内容）
+
+  实体对象-数据结构供参考：
+    FormInstance:
+       name: '表单名，模板提供  e.g. 充值表单'
+       formTempId : 'e.g. 10'
+       processInstanceId: '流程实例id'
+
+       modules[]: 'e.g. 基本信息 or 商户信息 or 财务信息 等等'
+        - formFileds[]:
+          - key* : 'e.g. licence'
+            type* : 'e.g. 文件'
+            name* : 'e.g. 资格文件'
+            intValue:
+            stringValue: 'e.g. 文件存放的url'
+            decimalValue:
+            dateValue:
+          moduleNo: 'e.g. M001'
+          moduleName: '商户信息'
+          readable: 'true'
+          writalbe: 'false'
+        - ...
+
+formService.saveFormInstance(formInstance)做的事：
+  更新条件: 当原记录更新人为空或为当前用户，更新记录。
+  更新字段: value ， updatedBy， updatedTime
+
+
+
+其他：T_PROCESS_FORM_TEMPLATE_MODULE表中displayFlag是一个给前端参考的字段。
+      前端查询表单模板时，不需要过滤displayFlag = false的模块。
+      根据表单模板创建表单实例记录时，不需要考虑displayFlag的取值。
