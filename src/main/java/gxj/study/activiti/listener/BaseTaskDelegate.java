@@ -30,11 +30,11 @@ public abstract class BaseTaskDelegate implements JavaDelegate {
         if(!isSuccess) {
             processService.shutDownProcessInstance(processInstanceId, deleteReason);
         }
-        log.info("系统自动执行回调任务, 结果："+isSuccess);
+        System.out.println("系统自动执行回调任务, 结果："+isSuccess);
 
     }
 
-    void setDeleteReason(String reason){
+    public void setDeleteReason(String reason){
         deleteReason = reason;
     }
 
@@ -44,7 +44,7 @@ public abstract class BaseTaskDelegate implements JavaDelegate {
      *  任务执行成功，请返回true
      * @return 任务执行结果
      */
-    abstract boolean doTask();
+    public abstract boolean doTask();
 
 
 

@@ -19,6 +19,7 @@ import org.activiti.bpmn.model.ParallelGateway;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
 
 import java.util.ArrayList;
@@ -64,6 +65,9 @@ public class BpmnConverter {
                 userTask.setPriority(String.valueOf(taskDef.getPriority()));
             }
             userTask.setDueDate(taskDef.getDueDate());
+//            userTask.setTaskListeners();
+//            userTask.setExecutionListeners();
+
             process.addFlowElement(userTask);
         });
 
@@ -104,6 +108,7 @@ public class BpmnConverter {
         process.setDocumentation("document123");
         process.setName("name1323");
         bpmnModel.addProcess(process);
+
         return bpmnModel;
     }
 }

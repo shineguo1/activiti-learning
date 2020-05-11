@@ -1,0 +1,42 @@
+<boundaryEvent id="sid-2C3A3C84-B2E4-4B29-A319-0AFBC17544F0" attachedToRef="sid-C8781FAE-02B8-4F8D-9A7D-A8AB4A8CB95A"
+               cancelActivity="false">
+
+    <timerEventDefinition>
+
+        <timeDate>2016-06-04T15:03:00</timeDate>
+
+    </timerEventDefinition>
+
+</boundaryEvent>
+
+<serviceTask id="sid-F8D7E189-DB9F-49C2-87D6-D466398A889E" name="超时发送邮件" activiti:type="mail">
+
+<extensionElements>
+
+    <activiti:field name="to">
+
+        <activiti:string>763630473@qq.com</activiti:string>
+
+    </activiti:field>
+
+    <activiti:field name="from">
+
+        <activiti:string>763630473@qq.com</activiti:string>
+
+    </activiti:field>
+
+    <activiti:field name="subject">
+
+        <activiti:string>待办超时</activiti:string>
+
+    </activiti:field>
+
+    <activiti:field name="text">
+
+        <activiti:string>你有一个待办任务已经超时。</activiti:string>
+
+    </activiti:field>
+
+</extensionElements>
+
+</serviceTask>

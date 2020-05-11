@@ -1,5 +1,6 @@
-package gxj.study.activiti.listener;
+package gxj.study.activiti.listener.examples;
 
+import gxj.study.activiti.listener.BaseTaskDelegate;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -12,7 +13,7 @@ import java.io.Serializable;
 @Component
 public class MyFirstTaskDelegate extends BaseTaskDelegate implements Serializable{
     @Override
-    boolean doTask() {
+    public boolean doTask() {
         // suppose that system do some business tasks and find some jdbc errors
         // or you can return true while task is succeeded
         this.setDeleteReason("system tasks failed with jdbc errors：Duplicate entry '5' for key 'PRIMARY'");

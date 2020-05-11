@@ -33,3 +33,25 @@ FormInstance:
       readable: 'true'
       writalbe: 'false'
     - ...
+
+-------------------------------
+FormInstance:
+   name: 'e.g. 充值表单'
+#   formTempId : '不关联模板 无用 e.g. 10'
+   processInstanceId: '流程实例id'
+
+   modules[]: 'e.g. 基本信息 or 商户信息 or 财务信息 等等'
+    - formFileds[]:
+      - key* : 'e.g. licence'
+        type* : 'e.g. 文件'
+        name* : 'e.g. 资格文件'
+        intValue:
+        stringValue: 'e.g. 文件存放的url'
+        decimalValue:
+        dateValue:
+      - ...
+      moduleNo: 'e.g. M001'
+      moduleName: '商户信息'
+      readable: 'true' //数据库不存
+      writalbe: 'false' //数据库不存
+    - ...

@@ -1,0 +1,130 @@
+MainProcessDefReqDTO: # 创建主流程的reqDTO
+  name:
+  approvalProcess: 审批流程模板 # 记 ProcessDefKey
+  formTemp: 表单模板  # 记formTempId
+
+
+T_MainProcessDef: # 主流程 -
+  id: # int 11位
+  name: 业务流程名 # 20字
+  apprProcId: 审批流程Id # 11 位
+  formTempId: 模板Id #11 位
+  status: 启用状态(ENABLE:启用；DISABLE:禁用)
+  deleteFlag: 删除标识（0：正常；1：删除）
+  createdAt:
+  createdBy:
+  updatedAt:
+  updatedBy:
+
+T_ApproveProcessDef:
+  id: # int 11位
+  procName: 流程名 # 20字
+  procNo: 流程编号  # 9字母/数字
+  category: 分类  # 20字
+  status: 0:待审核、1:启用、2:禁用  # varchar 1  设置为启用之前，先检查是否有配置流程节点
+#  sort: 排序
+  remark: 备注 # 50字
+  deleteFlag: 删除标识（0：正常；1：删除）
+  createdAt:
+  createdBy: varchar 32
+  updatedAt:
+  updatedBy: varchar 32
+
+T_ApproveProcNodeDef:
+  id: # int 11位
+  name: 节点名称 # 20字
+  sort: 排序 # int 4位
+  status: 状态（0:启用/1:停用） # varchar 1
+#  candidateUsers: 候选人 a,b,c,d,e # varchar 32
+#  candidateGroups: 候选组 a,b,c,d,e # varchar 32
+  superiorFlag: 直属上级标识
+  manualFlag: true：人工审批/ false：系统审批
+  counterSignFlag: 会签标识
+  deleteFlag: 删除标识（0：正常；1：删除）
+  createdAt:
+  createdBy:
+  updatedAt:
+  updatedBy:
+
+T_PROCNODE_CANDIDATE_BIND:
+  id: # int 11位
+  candidateUser: 候选人 a,b,c,d,e # varchar 32
+  candidateGroup: 候选组 a,b,c,d,e # varchar 32
+  type: 0:候选人；1：候选组
+  deleteFlag:  删除标识（0：正常；1：删除）
+  createdAt:
+  createdBy:
+  updatedAt:
+  updatedBy:
+
+
+节点配置DTO: 查 T_ApproveProcNodeDef 表
+  id:
+  name: 节点名称
+  sort: 排序
+  status: 状态（启用/停用）
+  updatedBy: 
+  updatedAt: 时间
+
+节点详细配置DTO: 查 T_ApproveProcNodeDef 表
+  candidateUsers: 候选人 a,b,c,d,e
+  candidateGroups: 候选组 a,b,c,d,e
+  superiorFlag: 直属上级标识
+  manualFlag: true：人工审批/ false：系统审批
+  counterSignFlag: 会签标识
+  updatedBy: 
+  updatedAt: 时间
+
+节点配置Info:
+  id:
+  name: 节点名称
+  sort: 排序
+  status: 状态（启用/禁用）
+  candidateUsers: 候选人 a,b,c,d,e
+  candidateGroups: 候选组 a,b,c,d,e
+  superiorFlag: 直属上级标识
+  manualFlag: true：人工审批/ false：系统审批
+  counterSignFlag: 会签标识
+  createdAt:
+  createdBy:
+  updatedBy: 
+  updatedAt: 时间
+
+
+ProcessRunningTask:  #待办：查acitiviti的runtime tasks，按人分类。
+  id:
+  mainProcessDefName: 业务流程名（筛选条件：根据业务流程名去查表，查到审批流程key）
+  instanceName: 发起的实例名称  #对应activiti-name
+#  approvalProcessDefName: 审批流程模板名
+  initiator: 发起人  #对应activiti
+  formName: 表单名 #
+  createdAt: 发起时间  # 对应activiti
+
+ProcessHistoryInfo: #历史记录 - 流程历史信息：activiti查
+  processInstanceId: #activiti 提供
+  mainProcessDefName: # 对应ACT_HIS_PROCINST表字段 - businesskey - 主流程id - 去查name - 直接取name吧，别查了。
+  processDefName: #activiti 提供 - HistoricProcessInstance.getProcessDefinitionName()
+  instanceName: # 对应ACT_HIS_PROCINST表字段 - instanceName
+  initiator: 发起人  #对应ACT_HIS_PROCINST表字段  start_user_id_
+  createTime: #activiti 提供
+  finishTime: #activiti 提供
+  action:
+    查看报告:  formService.queryFormInstance(processInstanceId)
+    审批日志: processService.queryTasksHistory(processInstanceId) - 查历史activity ACT_HIS_ACTINST
+
+TaskHistoryInfo:  #审批日志 - 任务节点历史信息
+  taskName: 任务描述 #表ACT_HIS_ACTINST字段 act_name_
+  operator: 操作人 # activiti assignee
+  actType: 类型 # 表ACT_HIS_ACTINST字段 act_type_
+  startTime:
+  endTime:
+  comment: #评论  查表ACT_HIS_TASKINST字段 description
+  deleteReason: #  表ACT_HIS_ACTINST字段 delete_reason
+
+
+
+
+
+
+
+Approval

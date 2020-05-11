@@ -45,6 +45,8 @@ flowNode:
          add tasks //priority = n
          add lines (网关 to tasks)
          add 并行网关2
+         add lines (tasks to 网关2)
+
            // 会签无回退
       if nodes = 1 //非会签
          add task //priority = n
@@ -53,7 +55,8 @@ flowNode:
          else
             and line (lastNode to task)
          add 排他网关
-         add line(网关 to 1,condition = 条件表达式-回退)
+         add line(网关 to firstTask,condition = 条件表达式-退回起点)
+         add line(网关 to lastNode,condition = 条件表达式-回退一步)
 
 
 

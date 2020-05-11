@@ -1,38 +1,47 @@
 package gxj.study;
 
 import gxj.study.activiti.config.SecurityUtil;
-import gxj.study.activiti.listener.MyFirstTaskDelegate;
+import gxj.study.activiti.listener.CommonTaskDelegate;
+import gxj.study.activiti.listener.examples.MyFirstCallBackTask;
+import gxj.study.activiti.listener.examples.MyFirstTaskDelegate;
 import gxj.study.activiti.service.FormService;
 import gxj.study.activiti.util.SpringContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.activiti.api.process.model.ProcessInstance;
-import org.activiti.api.process.model.builders.GetProcessDefinitionsPayloadBuilder;
 import org.activiti.api.process.model.builders.GetVariablesPayloadBuilder;
 import org.activiti.api.process.model.builders.ProcessPayloadBuilder;
-import org.activiti.api.process.model.payloads.GetProcessDefinitionsPayload;
+import org.activiti.api.process.model.builders.ResumeProcessPayloadBuilder;
+import org.activiti.api.process.model.payloads.ResumeProcessPayload;
 import org.activiti.api.process.runtime.ProcessRuntime;
 import org.activiti.api.runtime.shared.query.Page;
 import org.activiti.api.runtime.shared.query.Pageable;
 import org.activiti.api.task.model.Task;
 import org.activiti.api.task.model.builders.GetTaskVariablesPayloadBuilder;
+import org.activiti.api.task.model.builders.GetTasksPayloadBuilder;
 import org.activiti.api.task.model.builders.SetTaskVariablesPayloadBuilder;
 import org.activiti.api.task.model.builders.TaskPayloadBuilder;
-import org.activiti.api.task.model.builders.UpdateTaskPayloadBuilder;
 import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.TaskService;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author xinjie_guo
  * @version 1.0.0 createTime:  2020/3/4 10:15
  * @description
  */
+@Slf4j
 public class Activiti7Test extends BaseTest {
 
     @Autowired
@@ -46,6 +55,9 @@ public class Activiti7Test extends BaseTest {
 
     @Autowired
     private FormService formService;
+
+    @Autowired
+    private ProcessEngine processEngine;
 
     /**
      * activiti7 接口
@@ -99,13 +111,17 @@ public class Activiti7Test extends BaseTest {
      */
     @Test
     public void test_create_process_instance_withForm() {
-        securityUtil.logInAs("bob");
+        test_clear_all();
+        securityUtil.logInAs("other");
         HashMap<String, Object> vars = new HashMap<>();
-        vars.put("delegateImpl", SpringContextHolder.getBean(MyFirstTaskDelegate.class));
-        vars.put("formTempId","63");
+//        vars.put("delegateImpl", SpringContextHolder.getBean("commonTaskDelegate"));
+//        vars.put("delegateImpl", SpringContextHolder.getBean("serializableTaskDelegate"));
+//        vars.put("systemTask", MyFirstCallBackTask.class.getSimpleName());
+//        vars.put("formTempId","63");
+        vars.put("assignee", "other");
         ProcessInstance processInstance = processRuntime.start(ProcessPayloadBuilder
                 .start()
-                .withProcessDefinitionKey("myProcess_systemTask_1")
+                .withProcessDefinitionKey("my_test_process2")
 //                .withName("Processing Content: " + content)
                 .withVariables(vars)
                 .build());
@@ -114,7 +130,7 @@ public class Activiti7Test extends BaseTest {
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
         List<String> startEventFormTypes = bpmnModel.getStartEventFormTypes();
         System.out.println(">>> 流程表单详情: " + startEventFormTypes);
-        test_query_and_complete_tasks();
+//        test_query_and_complete_tasks();
     }
 
     /**
@@ -123,8 +139,13 @@ public class Activiti7Test extends BaseTest {
     @Test
     public void test_query_and_complete_tasks() {
 //        for (int i = 0; i < 5; i++) {
-            test_login_and_query_and_complete_users_tasks("other");
-            test_login_and_query_and_complete_users_tasks("john");
+//        test_login_and_query_and_complete_users_tasks("other");
+//        test_login_and_query_and_complete_users_tasks("bob");
+//        test_login_and_query_and_complete_users_tasks("bob");
+//        test_login_and_query_and_complete_users_tasks("other");
+
+        test_login_and_query_and_complete_users_tasks("john");
+//        test_login_and_query_and_complete_users_tasks("other");
 //        }
     }
 
@@ -137,7 +158,8 @@ public class Activiti7Test extends BaseTest {
         //模拟用户认证信息
         securityUtil.logInAs(username);
         Map<String, Object> vars = new HashMap<>();
-//        vars.put("amount",5);
+        vars.put("operation","restart");
+//        vars.put("assignee","j");
         //查询当前任务
         Page<Task> tasks = queryTasks();
         if (tasks.getTotalItems() > 0) {
@@ -154,7 +176,7 @@ public class Activiti7Test extends BaseTest {
      */
     private Page<Task> queryTasks() {
         //分页查询任务 : taskRuntime.tasks()
-        Page<Task> taskPage = taskRuntime.tasks(Pageable.of(0, 10));
+        Page<Task> taskPage = taskRuntime.tasks(Pageable.of(0, 10), new GetTasksPayloadBuilder().withGroup("activitiGroup").build());
         if (taskPage.getTotalItems() > 0) {
             //查询到有任务
             for (Task task : taskPage.getContent()) {
@@ -177,6 +199,9 @@ public class Activiti7Test extends BaseTest {
         doTasks(taskPage, new HashMap<>(), false);
     }
 
+    @Autowired
+    TaskService taskService;
+
     /**
      * 执行所有任务
      *
@@ -189,6 +214,8 @@ public class Activiti7Test extends BaseTest {
         if (taskPage.getTotalItems() > 0) {
             //查询到有任务
             for (Task task : taskPage.getContent()) {
+//                taskService.getVariable();
+//                taskService.addCandidateUser();
                 doTask(task, vars, isLocalOnly);
             }
         } else {
@@ -205,7 +232,17 @@ public class Activiti7Test extends BaseTest {
     private void doTask(Task task, Map<String, Object> vars, boolean isLocalOnly) {
         System.out.print(">>> 完成任务：" + task + "   ");
         //拾取任务: 个人获取组任务 -》组任务变为个人任务 -》组任务不可被他人获取
-        taskRuntime.claim(TaskPayloadBuilder.claim().withTaskId(task.getId()).build());
+        String loginUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (StringUtils.isBlank(task.getAssignee())) {
+            taskRuntime.claim(TaskPayloadBuilder.claim().withTaskId(task.getId()).build());
+        } else if (!task.getAssignee().equals(loginUser)) {
+            log.info(">>> processInstanceId:{}, taskId:{}, 任务已经被他人拾取, 拾取人:{}, 当前用户:{}", task.getProcessInstanceId(),
+                    task.getId(), task.getAssignee(), loginUser);
+//            throw new PostLoanException(PostLoanCodeEnum.PROC100002);
+        }
+//        taskRuntime.claim(TaskPayloadBuilder.claim().withTaskId(task.getId()).build());
+        if(Objects.isNull(vars))vars = new HashMap<>();
+        vars.put("lastAssignee",loginUser);
         System.out.print(">>> 拾取...   ");
         //设置任务 可见参数：taskId - 任务序列号；localOnly - 是否全局，local会有新参数id，非local会覆盖之前的值，并保留下去；variables - 参数列表。
 //        vars.put("amout",5);
@@ -218,6 +255,9 @@ public class Activiti7Test extends BaseTest {
         taskRuntime.complete(TaskPayloadBuilder.complete().withTaskId(task.getId()).build());
         System.out.println(">>> 执行...   ");
     }
+
+
+
 
     /**
      * 删除流程实例
@@ -249,8 +289,9 @@ public class Activiti7Test extends BaseTest {
         queryProcessInstances();
 
     }
+
     @Test
-    public void qurey_ten_processInstances(){
+    public void qurey_ten_processInstances() {
         securityUtil.logInAs("other");
         queryProcessInstances();
     }
@@ -259,7 +300,7 @@ public class Activiti7Test extends BaseTest {
     private Page<ProcessInstance> queryProcessInstances() {
         Page<ProcessInstance> processInstancePage = processRuntime.processInstances(Pageable.of(0, 10));
         if (processInstancePage.getTotalItems() > 0) {
-            processInstancePage.getContent().forEach(pi -> System.out.println(">>> 流程实例：" + pi + "  状态:" +pi.getStatus()));
+            processInstancePage.getContent().forEach(pi -> System.out.println(">>> 流程实例：" + pi + "  状态:" + pi.getStatus()));
         } else {
             System.out.println(">>> 查无流程实例");
         }
@@ -270,7 +311,7 @@ public class Activiti7Test extends BaseTest {
      * 查询运行时任务的变量
      */
     @Test
-    public void query_variables(){
+    public void query_variables() {
         String taskId = "";
         taskRuntime.variables(new GetTaskVariablesPayloadBuilder().withTaskId(taskId).build());
 

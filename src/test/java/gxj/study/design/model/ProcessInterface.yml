@@ -1,0 +1,90 @@
+主流程:
+createMainProcess(createReq) # /mainProc/add
+ - name 名称
+ - apprProcId 审批流程id 
+ - formTempId 表模板id
+ 
+updateMainProcess(updateReq)
+ - id
+ - name 名称
+ - apprProcId 审批流程id 
+ - formTempId 表模板id
+ 
+queryMainProcess(...)
+ - nameLike
+ - apprProcId
+ - formTempId
+ 
+startMainProcess(...)
+ - employee
+ - mainProcId
+ 
+deleteMainProcess()
+ - id
+ 
+审批流程:
+createApprProcess(...) # 触发service.deloy
+ - name
+ - no
+ - category
+ - status
+ - remark
+ 
+updateApprProcess(...) # 触发service.deloy
+ - id
+ - name
+ - no
+ - category
+ - status
+ - remark
+ 
+deleteApprProcess(...) # 感觉不用，因为禁用
+ - id
+ 
+queryApprProcess(...)
+ - no
+ - name
+ - category
+ - status
+ 
+ 
+ service.deployProcess()
+  - id or Object
+  
+审批节点:
+create()
+ - name
+ - sort
+ - status 
+ - superiorFlag
+ - manualFlag
+ - counterSignFlag
+ - List<> candidateUsers
+ - List<> candidateGroups
+ 
+update()
+ - id
+ - name
+ - sort
+ - status 
+ - superiorFlag
+ - manualFlag
+ - counterSignFlag
+ - List<> candidateUsers
+ - List<> candidateGroups
+ 
+delete()
+ -id
+ 
+List<> queryAll()
+ - apprProcId 
+ 
+queryDetail()
+ - id
+ 
+ 
+ 
+ 
+ 
+
+ 

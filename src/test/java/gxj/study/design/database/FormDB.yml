@@ -2,7 +2,7 @@
     id : '主键'
     name: '表名称  e.g. 充值表单'
 #    formTempNo : 'e.g. myForm_01' 取决于前端是否需要对表单标识一个Code'
-    processDefId: '即activiti的processDefinitionId' "myProcess_01"
+ #    processDefId: '即activiti的processDefinitionId' "myProcess_01"
         # formTempNo 和 processType 存在1对多关系
     deleteFlag: '0:否; 1:是'
     createdBy:
@@ -39,9 +39,11 @@ T_PROCESS_FORM_INSTANCE:
   id : '主键'
   processInstanceId:
   formTempId : '表类型'
-  moduleNo:
-  moduleName:
+  formName: '表名'
+  moduleNo: 1； 2
+  moduleName:  策略a ; 策略b
   entityKey : '表字段 key值'
+  entityName: '表字段 中文名称'
   valueType: '字段业务类型 e.g. 文件，图片，视频，文字，金额'
   intValue: '字段值'
   stringValue: '字段值 e.g. 上海'

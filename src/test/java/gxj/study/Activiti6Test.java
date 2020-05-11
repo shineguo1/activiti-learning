@@ -1,31 +1,44 @@
 package gxj.study;
 
 import gxj.study.activiti.util.BpmnMockData;
+import lombok.extern.slf4j.Slf4j;
+import org.activiti.api.task.model.builders.SetTaskVariablesPayloadBuilder;
+import org.activiti.api.task.model.builders.TaskPayloadBuilder;
+import org.activiti.api.task.runtime.TaskRuntime;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author xinjie_guo
  * @version 1.0.0 createTime:  2020/3/4 10:15
  * @description
  */
+@Slf4j
 public class Activiti6Test extends BaseTest {
 
     @Autowired
@@ -111,7 +124,8 @@ public class Activiti6Test extends BaseTest {
 
     @Autowired
     TaskService taskService;
-
+@Autowired
+TaskRuntime taskRuntime;
     /**
      * 查询任务
      */
@@ -123,11 +137,12 @@ public class Activiti6Test extends BaseTest {
         TaskService taskService = processEngine.getTaskService();
 //查询组任务
         List<Task> list = taskService.createTaskQuery()//
+
 //                .processDefinitionKey(processDefinitionKey)//
-                .taskCandidateUser(candidateUser)//根据候选人查询
+//                .taskCandidateUser(candidateUser)//根据候选人查询
                 .list();
         System.out.println(">>> other任务：" + list);
-
+        Task task = list.get(0);
         candidateUser = "john";
         list = taskService.createTaskQuery()//
 //                .processDefinitionKey(processDefinitionKey)//
@@ -148,22 +163,39 @@ public class Activiti6Test extends BaseTest {
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
         List<HistoricProcessInstance> list = historicProcessInstanceQuery
                 .involvedUser("bob")
-//                .processDefinitionKey("myProcess_BpmnModel_01")
-                .processInstanceBusinessKey("someBusiness")
+                .processDefinitionKey("my_test_process2")
+                .includeProcessVariables()
+                .orderByProcessInstanceStartTime()
+                .desc()
+//                .processInstanceBusinessKey("someBusiness")
                 .list();
         System.out.println(">>>历史记录："+list.size()+"条");
         list.forEach(hisProcess -> {
             System.out.println(">>>历史记录：" + hisProcess);
-            String superProcessInstanceId = hisProcess.getSuperProcessInstanceId();//是null，没做到过滤
+            String processId = hisProcess.getId();//是null，没做到过滤
             HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
             List<HistoricTaskInstance> tasks = historicTaskInstanceQuery
-                    .processInstanceId(superProcessInstanceId)
+                    .processInstanceId(processId)
+                    .includeProcessVariables()
+                    .includeTaskLocalVariables()
                     .list();
             System.out.println(">>>历史记录："+tasks.size()+"条");
             tasks.forEach(hisTask -> System.out.println(">>>历史记录：" + hisTask));
 
 
         });
+
+        List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId("c1640dee-7d65-11ea-b6bb-00ff4dd4770c")
+                .orderByHistoricActivityInstanceStartTime()
+                .desc()
+                .list();
+
+        List<HistoricVariableInstance> vars = historyService.createHistoricVariableInstanceQuery()
+//                .processInstanceId()
+                .executionId(activities.get(3).getExecutionId())
+                .list();
+
 
 //        historyService.createProcessInstanceHistoryLogQuery()
     }

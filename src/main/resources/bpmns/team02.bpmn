@@ -10,7 +10,7 @@
         <activiti:formProperty/>
       </extensionElements>
     </startEvent>
-    <userTask activiti:candidateGroups="activitiTeam" activiti:exclusive="true" id="_3" name="task1"/>
+    <userTask activiti:candidateGroups="aaa,bbb,ccc" activiti:candidateUsers="${users}" activiti:exclusive="true" id="_3" name="task1"/>
     <userTask activiti:candidateGroups="activitiTeam" activiti:exclusive="true" id="_4" name="task2"/>
     <endEvent id="_5" name="EndEvent"/>
     <sequenceFlow id="_6" sourceRef="_2" targetRef="_3"/>
@@ -25,12 +25,12 @@
     <sequenceFlow id="_14" sourceRef="_4" targetRef="_9"/>
     <userTask activiti:candidateGroups="activitiTeam" activiti:dueDate="${dueDate}" activiti:exclusive="true" activiti:formKey="fk_task1.1form" activiti:priority="${priority}" id="_7" name="task1.1">
       <extensionElements>
-        <activiti:formProperty id="name" name="濮撳�?" readable="true" required="true" type="String" variable="v_name" writable="true">
+        <activiti:formProperty id="name" name="婵犵數濮甸鏍窗濡ゅ懎绠伴柟闂寸缁狅�??" readable="true" required="true" type="String" variable="v_name" writable="true">
           <activiti:value id="name1" name="n_name1"/>
           <activiti:value id="name2" name="n_name2"/>
           <activiti:value id="name3" name="n_name3"/>
         </activiti:formProperty>
-        <activiti:formProperty id="age" name="骞撮�?" readable="true" required="false" type="String" variable="v_age" writable="true">
+        <activiti:formProperty id="age" name="濠德�??楁慨鐑藉磻閻愬搫绠扮?规洖娲﹂锟??" readable="true" required="false" type="String" variable="v_age" writable="true">
           <activiti:value id="age1" name="n_age1"/>
           <activiti:value id="age2" name="n_age2"/>
         </activiti:formProperty>
