@@ -1,6 +1,10 @@
 package gxj.study.activiti.service;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author xinjie_guo
@@ -11,6 +15,14 @@ import org.springframework.stereotype.Service;
 public class UserInfoService {
 
     public String selectSuperior(String username){
-        return "admin";
+        return "username:"+username;
+    }
+
+    public Object parseObject(String json){
+        return JSON.parseObject(json);
+    }
+
+    public List<String> selectLeaders(){
+        return Arrays.asList("a","b","c","d,dd");
     }
 }

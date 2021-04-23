@@ -21,6 +21,10 @@ public class SecurityUtil {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    public static String test(){
+        throw new RuntimeException("not mock");
+    }
+
     public void logInAs(String username) {
 
         UserDetails user = userDetailsService.loadUserByUsername(username);

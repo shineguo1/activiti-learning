@@ -1,19 +1,12 @@
 package gxj.study.activiti.listener;
 
-import gxj.study.activiti.service.ProcessFacade;
-import gxj.study.activiti.service.ProcessService;
-import gxj.study.activiti.util.SpringContextHolder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.api.model.shared.model.VariableInstance;
 import org.activiti.engine.delegate.*;
 import org.activiti.engine.impl.el.ExpressionManager;
-import org.activiti.engine.impl.el.JuelExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,20 +17,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * @description
  */
 @Slf4j
-@Component
-public class CommonTaskDelegate implements TaskListener,JavaDelegate,Serializable{
+@Component("taskCreateListener")
+public class TaskCreateListener implements TaskListener,JavaDelegate,Serializable{
 //    @Autowired
 //    private ProcessService processService;
 
     private Map<String, ProcessCallbackTask> systemTasks = new ConcurrentHashMap<>();
 
     @Autowired
-    public CommonTaskDelegate(List<ProcessCallbackTask> tasks){
+    public TaskCreateListener(List<ProcessCallbackTask> tasks){
         for(ProcessCallbackTask task: tasks){
             systemTasks.put(task.getClass().getSimpleName(),task);
         }
     }
-    public CommonTaskDelegate(){
+    public TaskCreateListener(){
 
     }
     @Override
