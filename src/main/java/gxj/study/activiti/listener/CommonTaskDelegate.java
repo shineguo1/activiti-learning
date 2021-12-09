@@ -51,6 +51,10 @@ public class CommonTaskDelegate implements TaskListener,JavaDelegate,Serializabl
 //        if(!result.isSuccess()) {
 //            processService.shutDownProcessInstance(processInstanceId, result.getErrorMsg());
 //        }
+        Expression expression = new ExpressionManager().createExpression("${userInfoService.valueIn('ab',userInfoService.selectRootLeaderList('a'))}");
+//      下面这个表达式值为true。 formData = {'a':'A', 'b':'B'};
+//        Expression expression = new ExpressionManager().createExpression("${userInfoService.parseObject(formData).a != 'a' && userInfoService.parseObject(formData).b == 'B'}");
+        expression.getValue(execution);
         System.out.println("系统自动执行回调任务, 结果：");
 
     }

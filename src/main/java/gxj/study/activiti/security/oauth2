@@ -1,0 +1,14 @@
+*　授权码模式
+1. 获得授权码
+GET：http://localhost:8081/oauth/authorize?client_id=myClient&response_type=code
+重定向：https://www.baidu.com/?code=VYMph2 ## https://www.baidu.com是配置的redirectUri
+
+2. 获取token
+POST：http://localhost:8081/oauth/token?code=VYMph2&grant_type=authorization_code&redirect_uri=http://www.baidu.com&scope=all
+response: {
+              "access_token": "f85b6742-8df5-4a8f-b9a8-9846fe944de1",
+              "token_type": "bearer",
+              "refresh_token": "1f69687b-ed31-4b13-9031-a6f5aa4c93c8",
+              "expires_in": 43199,
+              "scope": "all"
+          }

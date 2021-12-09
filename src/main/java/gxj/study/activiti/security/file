@@ -1,0 +1,57 @@
+security过滤器chain拦截:
+UsernamePasswordAuthenticationFilter: 是验证用户名登录的过滤器？一个猜想，不一定对。
+三个可重写的父类方法：
+* attemptAuthentication（抽象）方法：身份认证
+* successfulAuthentication（protected）方法：成功回调
+* unsuccessfulAuthentication（protected）方法：失败回调
+
+
+1. 过滤器如何加载(不使用springboot情况下)：
+* DelegatingFilterProxy 配置过滤器->调用initDelegate方法初始化->getBean “filterChainProxy”->调用doFilter方法->调用getFilters方法->把所有filter加载到SecurityFilterChain中
+2. 重要接口UserDetailsService
+* 设置用户名密码
+3. 重要接口PasswordEncoder
+* 设置密码加密
+
+4. security如何设置用户认证（用户名、密码）？
+* 方法一：在application.properties配置属性 spring.security.user.name = xxx,  spring.security.user.password = xxx
+* 方法二：配置类：实现WebSecurityConfigurerAdapter类 + 重写configure方法 + 配置PasswordEncoder bean对象。
+* 方法三：配置类+查库(自定义实现类)：配置类基础上实现UserDetailsService接口。 [详细用法参考：gxj.study.activiti.security.SecurityConfig类]
+
+5. 配置类能做什么：
+* 请求的身份认证
+* 请求的角色授权
+* 认证失败的response响应、页面跳转
+* 自定义登录页
+* 自定义filterChain
+* 登出回调处理
+* csrf
+
+6. 注解
+* @Secured：
+    如 @Secured("ROLE_role1","ROLE_role2")
+    访问请求需要拥有注解里的角色之一，类似于hasAnyRole，但需要显式地添加ROLE_前缀. 需要启动类上开启 @EnableGlobalMethodSecurity(securedEnabled = true)
+* @PreAuthorize： 方法执行前验证
+* @PostAuthorize：方法执行后验证
+* @PostFilter：权限验证后过滤
+* @PreFilter：权限验证前过滤
+
+7. 基于数据库记住token
+* 里层：RememberMeService + JdbcTokenRepository（sql语句）：首次认证，将token写入cookie和数据库
+* 表层: RememberMeAuthenticationFilter ：后续登录，读取cookie中的token（调RememberMeService.autoLogin对比数据库的token）。
+
+8. Csrf攻击防护
+* CsrfFilter：第一次request生成csrfToken，后续request校验csrfToken
+* csrfTokenRepository：(security提供)基于cookie或基于session两种
+
+9. 过程
+* UsernamePasswordAuthenticationFilter
+  -(认证)-> AuthenticationManager(ProviderManager)
+  -(委托)-> AuthenticationProvider(DaoAuthenticationProvider)
+  -(关联)-> UserDetailsService
+  -(返回)-> UserDetails
+  -(封装)-> Authentication(已认证)
+  -(封装)-> SecurityContext(SecurityContextImpl)
+  -(存入)-> SecurityContextHolder
+  -------> SecurityContextPersistenceFilter
+  -(响应返回)->
